@@ -1,60 +1,125 @@
-// Data from localStorage or empty
-let events = JSON.parse(localStorage.getItem('events')) || [];
-let registrations = JSON.parse(localStorage.getItem('registrations')) || {};
-let selectedEventId = null;
+// Get registrations from localStorage
+function getRegistrations() {
+  return JSON.parse(localStorage.getItem('registrations')) || [];
+}
 
-// Get DOM elements
-const eventForm = document.getElementById('eventForm');
-const eventList = document.getElementById('eventList');
-const registerForm = document.getElementById('registerForm');
-const registerSection = document.getElementById('registerSection');
-const registerTitle = document.getElementById('registerTitle');
-const registrationList = document.getElementById('registrationList');
+// Save registrations to localStorage
+function saveRegistrations(data) {
+  localStorage.setItem('registrations', JSON.stringify(data));
+}
 
-// Save data to localStorage
-const saveData = () => {
-  localStorage.setItem('events', JSON.stringify(events));
-  localStorage.setItem('registrations', JSON.stringify(registrations));
-};
+// Update stats on Home page
+function updateStats() {
+  const totalEventsEl = document.getElementById('totalEvents');
+  const totalRegsEl = document.getElementById('totalRegistrations');
+  if (totalEventsEl) {
+    totalEventsEl.innerText = 3; // Fixed 3 events
+    totalRegsEl.innerText = getRegistrations().length;
+  }
+}
 
-// Render all events
-const renderEvents = () => {
-  eventList.innerHTML = '';
-  if (events.length === 0) {
-    eventList.innerHTML = '<div class="empty">No events yet. Create one!</div>';
+// Update event registration counts on Events page
+function updateEventCounts() {
+  const regs = getRegistrations();
+  const events = ['Hackathon 2026', 'Technical Workshop', 'Cultural Fest'];
+  
+  events.forEach(event => {
+    const count = regs.filter(r => r.event === event).length;
+    const el = document.getElementById(`count-${event}`);
+    if (el) el.innerText = count;
+  });
+}
+
+// Show message
+function showMessage(text, type) {
+  const msgEl = document.getElementById('message');
+  if (msgEl) {
+    msgEl.innerText = text;
+    msgEl.className = type;
+    setTimeout(() => {
+      msgEl.innerText = '';
+      msgEl.className = '';
+    }, 3000);
+  }
+}
+
+// Render registration list on Register page
+function renderRegistrations() {
+  const listEl = document.getElementById('registrationList');
+  if (!listEl) return;
+  
+  const regs = getRegistrations();
+  listEl.innerHTML = '';
+  
+  if (regs.length === 0) {
+    listEl.innerHTML = '<p class="empty">No registrations yet.</p>';
     return;
   }
-
-  events.forEach(event => {
+  
+  regs.slice().reverse().forEach((reg, index) => {
     const div = document.createElement('div');
-    div.className = 'event-item';
+    div.className = 'reg-item';
     div.innerHTML = `
-      <h3>${event.title}</h3>
-      <p><strong>Date:</strong> ${event.date}</p>
-      <p><strong>Location:</strong> ${event.location}</p>
-      <p>${event.description}</p>
-      <button onclick="showRegister(${event.id}, '${event.title.replace(/'/g, "\\'")}')">View & Register</button>
-      <button class="delete-btn" onclick="deleteEvent(${event.id})">Delete</button>
+      <span><strong>${reg.name}</strong> - ${reg.event}</span>
+      <button class="delete-btn" onclick="deleteRegistration(${regs.length - 1 - index})">Delete</button>
     `;
-    eventList.appendChild(div);
+    listEl.appendChild(div);
   });
-};
+}
 
-// Create new event
-eventForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const newEvent = {
-    id: Date.now(),
-    title: document.getElementById('title').value,
-    description: document.getElementById('description').value,
-    date: document.getElementById('date').value,
-    location: document.getElementById('location').value
-  };
-  events.unshift(newEvent);
-  saveData();
-  renderEvents();
-  eventForm.reset();
+// Delete registration
+function deleteRegistration(index) {
+  if (!confirm('Delete this registration?')) return;
+  let regs = getRegistrations();
+  regs.splice(index, 1);
+  saveRegistrations(regs);
+  renderRegistrations();
+  updateStats();
+  updateEventCounts();
+}
+
+// Handle form submit on Register page
+const form = document.getElementById('registrationForm');
+if (form) {
+  // Auto-select event from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const eventParam = urlParams.get('event');
+  if (eventParam) {
+    document.getElementById('eventName').value = eventParam;
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const eventName = document.getElementById('eventName').value;
+    
+    if (!name || !email || !eventName) {
+      showMessage('Please fill all fields', 'error');
+      return;
+    }
+    
+    let regs = getRegistrations();
+    const exists = regs.some(r => r.email === email && r.event === eventName);
+    
+    if (exists) {
+      showMessage('This email already registered for this event', 'error');
+      return;
+    }
+    
+    regs.push({ name, email, event: eventName, time: new Date().toLocaleString() });
+    saveRegistrations(regs);
+    
+    showMessage(`Success! ${name} registered for ${eventName}`, 'success');
+    form.reset();
+    renderRegistrations();
+    updateEventCounts();
+  });
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', function() {
+  updateStats();
+  updateEventCounts();
+  renderRegistrations();
 });
-
-// Show register section for selected event
-window.showRegister = (event
