@@ -1,22 +1,32 @@
-document.addEventListener("DOMContentLoaded", function () {
+function selectEvent(eventName) {
+    document.getElementById("eventName").value = eventName;
+    window.location.href = "#register";
+}
 
-    const form = document.getElementById("registrationForm");
+document
+.getElementById("registrationForm")
+.addEventListener("submit", function(event){
 
-    if(form){
+    event.preventDefault();
 
-        form.addEventListener("submit", function(e){
+    let name =
+        document.getElementById("name").value;
 
-            e.preventDefault();
+    let email =
+        document.getElementById("email").value;
 
-            const name = document.getElementById("name").value;
-            const event = document.getElementById("event").value;
+    let eventName =
+        document.getElementById("eventName").value;
 
-            document.getElementById("success").innerHTML =
-                `Registration Successful!<br>
-                 Thank You ${name}<br>
-                 Event: ${event}`;
-
-            form.reset();
-        });
+    if(name === "" || email === "" || eventName === ""){
+        alert("Please fill all fields");
+        return;
     }
+
+    document.getElementById("message").innerHTML =
+        `Registration Successful! <br>
+         Name: ${name} <br>
+         Event: ${eventName}`;
+
+    document.getElementById("registrationForm").reset();
 });
