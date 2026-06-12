@@ -1,0 +1,50 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #1e40af;
+  margin-bottom: 30px;
+  font-size: 2.2rem;
+}
+
+h2 {
+  color: #1e3a8a;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #dbeafe;
+  padding-bottom: 8px;
+}
+
+h3 {
+  color: #1e40af;
+  margin-bottom: 8px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+input, textarea {
+  display
