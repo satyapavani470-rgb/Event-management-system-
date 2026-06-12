@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Event Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Event Management System</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="register.html" class="active">Register</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="register-section">
+    <h2>Event Registration</h2>
+    <form id="registrationForm">
+      <input type="text" id="name" placeholder="Enter Your Name" required>
+      <input type="email" id="email" placeholder="Enter Your Email" required>
+      <select id="eventName" required>
+        <option value="">Select Event</option>
+        <option>Hackathon 2026</option>
+        <option>Technical Workshop</option>
+        <option>Cultural Fest</option>
+      </select>
+      <button type="submit">Register Now</button>
+    </form>
+    <div id="message"></div>
+    
+    <div class="reg-list">
+      <h3>Recent Registrations</h3>
+      <div id="registrationList"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Event Management System</p>
+  </footer>
+
+  <script>
+    // Auto-select event from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventParam = urlParams.get('event');
+    if (eventParam) {
+      document.getElementById('eventName').value = eventParam;
+    }
+
+    // Load registrations
+    const renderRegistrations = () => {
+      const regs = JSON.parse(localStorage.getItem('registrations')) || [];
+      const list = document.getElementById('registrationList');
+      list.innerHTML = '';
+      if (regs.length === 0) {
+        list.innerHTML = '<p class="empty">No registrations yet.</p>';
+        return;
+      }
+      regs.slice(-5).reverse().forEach(r => {
+        list.innerHTML += `<p class="reg-item">${r.name} - ${r.event}</p>`;
+      });
+    };
+
+    // Form submit
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const eventName = document.getElementById('eventName').value;
+      
+      let registrations = JSON.parse(localStorage.getItem('registrations')) || [];
+      registrations.push({ name, email, event: eventName });
+      localStorage.setItem('registrations', JSON.stringify(registrations));
+      
+      document.getElementById('message').innerText = `Success! ${name} registered for ${eventName}`;
+      document.getElementById('registrationForm').reset();
+      renderRegistrations();
+      
+      setTimeout(() => {
+        document.getElementById('message').innerText = '';
+      }, 3000);
+    });
+
+    renderRegistrations();
+  </script>
+</body>
+  </html>
