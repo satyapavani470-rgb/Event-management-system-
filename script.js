@@ -1,32 +1,22 @@
-function selectEvent(eventName) {
-    document.getElementById("eventName").value = eventName;
-    window.location.href = "#register";
-}
+document.addEventListener("DOMContentLoaded", function () {
 
-document
-.getElementById("registrationForm")
-.addEventListener("submit", function(event){
+    const form = document.getElementById("registrationForm");
 
-    event.preventDefault();
+    if(form){
 
-    let name =
-        document.getElementById("name").value;
+        form.addEventListener("submit", function(e){
 
-    let email =
-        document.getElementById("email").value;
+            e.preventDefault();
 
-    let eventName =
-        document.getElementById("eventName").value;
+            const name = document.getElementById("name").value;
+            const event = document.getElementById("event").value;
 
-    if(name === "" || email === "" || eventName === ""){
-        alert("Please fill all fields");
-        return;
+            document.getElementById("success").innerHTML =
+                `Registration Successful!<br>
+                 Thank You ${name}<br>
+                 Event: ${event}`;
+
+            form.reset();
+        });
     }
-
-    document.getElementById("message").innerHTML =
-        `Registration Successful! <br>
-         Name: ${name} <br>
-         Event: ${eventName}`;
-
-    document.getElementById("registrationForm").reset();
 });
